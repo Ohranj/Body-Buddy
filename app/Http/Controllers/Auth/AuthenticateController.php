@@ -8,6 +8,7 @@ use Illuminate\Http\JsonResponse;
 use App\Http\Actions\Logs\InsertLog;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Validator;
 
 class AuthenticateController extends Controller
@@ -40,5 +41,16 @@ class AuthenticateController extends Controller
         $insertLog->execute($user, 'LOGGED_IN');
 
         return $this->sendJsonResponse(true, 'Account Authenticated', [], [], 200);
+    }
+
+    /**
+     * 
+     */
+    public function logout(Request $request): RedirectResponse
+    {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return redirect('/');
     }
 }

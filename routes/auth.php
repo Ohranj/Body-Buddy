@@ -10,3 +10,5 @@ Route::group(['middleware' => 'guest'], function () {
     Route::post('/login', [AuthenticateController::class, 'store']);
     Route::resource('/register', RegisterController::class)->only(['index', 'store']);
 });
+
+Route::post('/logout', [AuthenticateController::class, 'logout']);
