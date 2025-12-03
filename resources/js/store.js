@@ -12,6 +12,6 @@ export const notifications = reactive({
         this.items.splice(0, 1)
     },
     hide(index) {
-        this.items[index].show = false; 
+        this.items[index].show = false;
     }
 })

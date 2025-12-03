@@ -54,7 +54,7 @@ export default {
                 headers: {
                     'accept': 'application/json',
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': this.$globals.csrfToken
+                    'X-CSRF-TOKEN': this.$page.props.shared_token
                 }
             })
             const json = await response.json()
@@ -141,7 +141,7 @@ export default {
                     <small class="text-xs text-center block">Already have an account? <Link href="/" class="text-lime-600 hover:underline">Sign in here</Link></small>
                 </div>
             </div>
-            <div v-if="showMainSpinner" class="grid place-content-center h-screen gap-y-2">
+            <div v-if="showMainSpinner" class="grid place-content-center h-full gap-y-2">
                 <Spinner class="text-white w-12 h-12 animate-spin mx-auto" fill="green" />
                 <small class="text-center mx-auto block font-semibold">Loading resources...</small>
             </div>

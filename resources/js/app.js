@@ -10,17 +10,10 @@ createInertiaApp({
     setup({ el, App, props, plugin }) {
         const app = createApp({ render: () => h(App, props) })
         
-        app.config.globalProperties.$globals = getGlobalDefaults();
-
         app.use(plugin).component("Form", Form).component("Link", Link).mount(el)
     },
 })
 
-function getGlobalDefaults() {
-    return {
-        csrfToken: document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-    }
-}
 
 /**
  * Echo exposes an expressive API for subscribing to channels and listening

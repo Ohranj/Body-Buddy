@@ -32,7 +32,7 @@ export default {
                 headers: {
                     'acccept': 'application/json',
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': this.$globals.csrfToken
+                    'X-CSRF-TOKEN': this.$page.props.shared_token
                 }
             })
             const json = await response.json()
@@ -48,6 +48,9 @@ export default {
             await new Promise((res) => setTimeout(() => res(), 2500))
             router.visit('/dashboard');
         }
+    },
+    mounted() {
+        console.log(this.$page.props)
     }
 }
 </script>
