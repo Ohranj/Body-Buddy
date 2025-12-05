@@ -6,6 +6,10 @@ import WeightContainer from '../components/WeightContainer.vue';
 import Modal from '../components/Modal.vue';
 import {checkOutsideElemClick} from '../helpers'
 import Chevron from '../components/svg/Chevron.vue';
+import Bread from '../components/svg/Bread.vue';
+import Apple from '../components/svg/Apple.vue';
+import RiceBowl from '../components/svg/RiceBowl.vue';
+import Burger from '../components/svg/Burger.vue';
 
 export default {
     components: {
@@ -14,7 +18,11 @@ export default {
         CaloriesContainer,
         WeightContainer,
         Modal,
-        Chevron
+        Chevron,
+        Bread,
+        Apple,
+        RiceBowl,
+        Burger
     },
     data() {
         return {
@@ -89,21 +97,21 @@ export default {
                             </div>
                             <div class="font-semibold min-w-3/4 absolute top-full z-10 left-0 flex flex-col bg-white rounded-md p-0 overflow-hidden text-black transition-[max-height] duration-750 linear shadow shadow-slate-500" :class="modals.calories.meal.show ? 'max-h-[300px]' : 'max-h-0'">
                                 <div class="flex flex-col">
-                                    <div class="hover:bg-slate-300 p-1.5 cursor-pointer flex items-center gap-x-2" @click="modals.calories.meal.value = 'breakfast'; modals.calories.meal.show = false">
+                                    <div class="hover:bg-slate-300 p-1 cursor-pointer flex items-center gap-x-2" @click="modals.calories.meal.value = 'breakfast'; modals.calories.meal.show = false">
                                         <Avatar class="w-4 h-4" stroke="#000000" fill="none" />
-                                        <small>Breakfast</small>
+                                        <small class="flex items-center gap-x-2"><Bread class="w-5 h-5" fill="none" />Breakfast</small>
                                     </div>
-                                    <div class="hover:bg-slate-300 p-1.5 cursor-pointer flex items-center gap-x-2"  @click="modals.calories.meal.value = 'lunch'; modals.calories.meal.show = false">
+                                    <div class="hover:bg-slate-300 p-1 cursor-pointer flex items-center gap-x-2"  @click="modals.calories.meal.value = 'lunch'; modals.calories.meal.show = false">
                                         <Avatar class="w-4 h-4" stroke="#000000" fill="none" />
-                                        <small>Lunch</small>
+                                        <small class="flex items-center gap-x-2"><Burger class="w-5 h-5" fill="none" />Lunch</small>
                                     </div>
-                                    <div class="hover:bg-slate-300 p-1.5 cursor-pointer flex items-center gap-x-2"  @click="modals.calories.meal.value = 'dinner'; modals.calories.meal.show = false">
+                                    <div class="hover:bg-slate-300 p-1 cursor-pointer flex items-center gap-x-2"  @click="modals.calories.meal.value = 'dinner'; modals.calories.meal.show = false">
                                         <Avatar class="w-4 h-4" stroke="#000000" fill="none" />
-                                        <small>Dinner</small>
+                                        <small class="flex items-center gap-x-2"><RiceBowl class="w-5 h-5" fill="none" />Dinner</small>
                                     </div>
-                                    <div class="hover:bg-slate-300 p-1.5 cursor-pointer flex items-center gap-x-2"  @click="modals.calories.meal.value = 'snack'; modals.calories.meal.show = false">
+                                    <div class="hover:bg-slate-300 p-1 cursor-pointer flex items-center gap-x-2"  @click="modals.calories.meal.value = 'snack'; modals.calories.meal.show = false">
                                         <Avatar class="w-4 h-4" stroke="#000000" fill="none" />
-                                        <small>Snack</small>
+                                        <small class="flex items-center gap-x-2"><Apple class="w-5 h-5" fill="none" />Snack</small>
                                     </div>
                                 </div>
                             </div>
