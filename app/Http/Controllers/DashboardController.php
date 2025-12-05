@@ -16,7 +16,7 @@ class DashboardController extends Controller
         return Inertia::render('Dashboard', [
             'user' => Auth::user(),
             'date' => [
-                'human_day' => $date->format('l'),
+                'human_day' => $date->format('l jS F Y'),
                 'timestamp' => $date->timestamp
             ]
         ]);

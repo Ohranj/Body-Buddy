@@ -7,7 +7,7 @@
     @inertiaHead
 </head>
 
-<body class="p-2 sm:p-4 bg-zinc-900 text-white">
+<body class="p-4 sm:p-6 bg-zinc-900 text-white">
     @inertia
 </body>
 

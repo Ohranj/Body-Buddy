@@ -50,7 +50,15 @@ export default {
         }
     },
     mounted() {
-        console.log(this.$page.props)
+        document.addEventListener('keypress', (e) => {
+            if (e.key != 'Enter') {
+                return;
+            }
+            if (this.forms.login.email.length == 0) {
+                return 
+            }
+            this.onLoginSubmit()
+        })
     }
 }
 </script>
