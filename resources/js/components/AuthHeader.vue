@@ -2,12 +2,12 @@
 import Chevron from './svg/Chevron.vue';
 import Logout from './svg/Logout.vue';
 import Cog from './svg/Cog.vue'
-import Avatar from './svg/Avatar.vue';
+import Profile from './svg/Profile.vue';
 import {checkOutsideElemClick} from '../helpers'
 
 export default {
     components: {
-        Chevron, Logout, Cog, Avatar
+        Chevron, Logout, Cog, Profile
     },
     props: {
         user: Object
@@ -40,7 +40,7 @@ export default {
                 :class="show ? 'max-h-[300px]' : 'max-h-0'">
                 <div class="flex flex-col">
                     <div class="hover:bg-slate-300 p-1.5 cursor-pointer flex items-center gap-x-2">
-                        <Avatar class="w-4 h-4" stroke="#000000" fill="none" />
+                        <Profile class="w-4 h-4" stroke="#000000" fill="none" />
                         <small>My Profile</small>
                     </div>
                     <div class="hover:bg-slate-300 p-1.5 cursor-pointer flex items-center gap-x-2">

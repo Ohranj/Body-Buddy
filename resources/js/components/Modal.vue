@@ -16,7 +16,7 @@ export default {
 <template>
     <div v-show="show" class="fixed inset-0 z-50 backdrop-blur-sm bg-[#D3D3D340]">
         <div class="flex min-h-screen items-center justify-center px-2">
-            <div class="min-h-[375px] relative min-w-[300px] w-[475px] flex flex-col rounded-md shadow shadow-black bg-white text-black">
+            <div class="min-h-[375px] relative min-w-[300px] w-[475px] flex flex-col rounded-md shadow-md shadow-black bg-zinc-100 text-black">
                 <div class="p-4 flex items-center justify-between">
                     <h1 class="font-semibold tracking-wide text-lg" v-text="title"></h1>
                     <button @click="$emit('toggleModal')" class="hover:scale-[1.2]">

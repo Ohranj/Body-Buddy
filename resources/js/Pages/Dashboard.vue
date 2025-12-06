@@ -33,7 +33,7 @@ export default {
                     range: 500,
                     meal: {
                         show: false,
-                        value: 'breakfast'
+                        value: 'snack'
                     }
                 },
                 weight: {
@@ -44,11 +44,17 @@ export default {
     },
     methods: {
         toggleModal(key, val) {
+            if (key == 'calories') {
+                if (val) {
+                    this.modals.calories.range = 500;
+                    this.modals.calories.meal.show = false
+                    this.modals.calories.meal.value = 'snack'
+                }
+            }
             this.modals[key].show = val
         }
     },
     mounted() {
-
         document.addEventListener('click', (e) => {
             const insideTarget = this.checkOutsideElemClick(e, 'meal_dropdown');
             if (!insideTarget) {
@@ -83,41 +89,37 @@ export default {
 
             <Modal :show="modals.calories.show" title="Update Calories" @toggle-modal="() => toggleModal('calories', false)">
                 <template v-slot:content>
-                    <div class="flex flex-col p-4">
+                    <div class="flex flex-col p-0.5 sm:p-4">
                         <div class="flex flex-col">
-                            <small class="font-semibold text-sm">Use the slider to append to your daily calories total.</small>
-                            <input type="range" min="0" max="2000" step="10" class="accent-zinc-700 appearance-none cursor-pointer my-3.5" v-model="modals.calories.range" id="i_calories_range" />
-                            <small class="font-semibold">Append: <span v-text="modals.calories.range"></span></small>
+                            <small class="font-semibold text-[11px] sm:text-sm">Use the slider to append to your daily calories total.</small>
+                            <input type="range" min="0" max="2000" step="10" class="accent-zinc-700 appearance-none cursor-pointer my-3" v-model="modals.calories.range" id="i_calories_range" />
+                            <small class="font-semibold">Appending: <input type="number" class="px-1 min-w-[25px] rounded cursor-pointer" @click="(e) => e.target.select()" :style="{ width: modals.calories.range.toString().length * 10 + 'px' }" v-model="modals.calories.range" /></small>
                         </div>
                         <div class="flex flex-col gap-y-1.5 mt-8 relative" id="meal_dropdown">
-                            <small class="font-semibold text-sm">Select a meal reference.</small>
+                            <small class="font-semibold text-[11px] sm:text-sm">Select a meal reference.</small>
                             <div class="flex items-center gap-x-2 cursor-pointer" @click="modals.calories.meal.show = true">
-                                <input type="text" class="capitalize outline-none cursor-pointer w-[75px] font-semibold tracking-wide rounded text-xs" :value="modals.calories.meal.value" />
+                                <input type="text" class="capitalize outline-none cursor-pointer w-[55px] font-semibold tracking-wide rounded text-xs" :value="modals.calories.meal.value" />
                                 <Chevron class="w-4 h-4" :class="{'rotate-180' : modals.calories.meal.show}" stroke="#000000" fill="none" />
                             </div>
                             <div class="font-semibold min-w-3/4 absolute top-full z-10 left-0 flex flex-col bg-white rounded-md p-0 overflow-hidden text-black transition-[max-height] duration-750 linear shadow shadow-slate-500" :class="modals.calories.meal.show ? 'max-h-[300px]' : 'max-h-0'">
                                 <div class="flex flex-col">
                                     <div class="hover:bg-slate-300 p-1 cursor-pointer flex items-center gap-x-2" @click="modals.calories.meal.value = 'breakfast'; modals.calories.meal.show = false">
-                                        <Avatar class="w-4 h-4" stroke="#000000" fill="none" />
                                         <small class="flex items-center gap-x-2"><Bread class="w-5 h-5" fill="none" />Breakfast</small>
                                     </div>
                                     <div class="hover:bg-slate-300 p-1 cursor-pointer flex items-center gap-x-2"  @click="modals.calories.meal.value = 'lunch'; modals.calories.meal.show = false">
-                                        <Avatar class="w-4 h-4" stroke="#000000" fill="none" />
                                         <small class="flex items-center gap-x-2"><Burger class="w-5 h-5" fill="none" />Lunch</small>
                                     </div>
                                     <div class="hover:bg-slate-300 p-1 cursor-pointer flex items-center gap-x-2"  @click="modals.calories.meal.value = 'dinner'; modals.calories.meal.show = false">
-                                        <Avatar class="w-4 h-4" stroke="#000000" fill="none" />
                                         <small class="flex items-center gap-x-2"><RiceBowl class="w-5 h-5" fill="none" />Dinner</small>
                                     </div>
                                     <div class="hover:bg-slate-300 p-1 cursor-pointer flex items-center gap-x-2"  @click="modals.calories.meal.value = 'snack'; modals.calories.meal.show = false">
-                                        <Avatar class="w-4 h-4" stroke="#000000" fill="none" />
                                         <small class="flex items-center gap-x-2"><Apple class="w-5 h-5" fill="none" />Snack</small>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <button class="bg-blue-500 hover:bg-blue-600 text-sm rounded-md px-2 py-1 self-end mt-4 cursor-pointer shadow shadow-black font-semibold text-white min-w-[95px]">Confirm</button>
-                        <div class="flex items-center gap-x-4 mt-12">
+                        <div class="flex items-center gap-x-4 mt-4">
                             <div class="grow border-b-2 border-dashed text-red-500"></div>
                             <small class="text-red-500 font-semibold">Danger Zone</small>
                             <div class="grow border-b-2 border-dashed text-red-500"></div>
