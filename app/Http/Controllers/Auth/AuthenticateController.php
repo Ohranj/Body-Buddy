@@ -35,8 +35,6 @@ class AuthenticateController extends Controller
             return $this->sendJsonResponse(false, 'Unable to authenticate credentials', [], [], 422);
         }
 
-        $request->session()->regenerate();
-
         $user = Auth::user();
         $insertLog->execute($user, 'LOGGED_IN');
 
@@ -49,8 +47,6 @@ class AuthenticateController extends Controller
     public function logout(Request $request): RedirectResponse
     {
         Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
         return redirect('/');
     }
 }

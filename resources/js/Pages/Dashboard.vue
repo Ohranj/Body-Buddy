@@ -118,13 +118,13 @@ export default {
                                 </div>
                             </div>
                         </div>
-                        <button class="bg-blue-500 hover:bg-blue-600 text-sm rounded-md px-2 py-1 self-end mt-4 cursor-pointer shadow shadow-black font-semibold text-white min-w-[95px]">Confirm</button>
+                        <button class="bg-blue-500 hover:bg-blue-600 text-sm rounded px-2 py-1 self-end mt-4 cursor-pointer shadow shadow-black font-semibold text-white min-w-[95px]">Confirm</button>
                         <div class="flex items-center gap-x-4 mt-4">
                             <div class="grow border-b-2 border-dashed text-red-500"></div>
                             <small class="text-red-500 font-semibold">Danger Zone</small>
                             <div class="grow border-b-2 border-dashed text-red-500"></div>
                         </div>
-                        <button class="bg-red-500 hover:bg-red-600 text-sm mt-4 rounded-md px-2 py-1 font-semibold text-white shadow shadow-black self-end cursor-pointer">Reset Calories</button>
+                        <button class="bg-red-500 hover:bg-red-600 text-sm mt-4 rounded px-2 py-1 font-semibold text-white shadow shadow-black self-end cursor-pointer">Reset Calories</button>
                     </div>
                 </template>
             </Modal>
