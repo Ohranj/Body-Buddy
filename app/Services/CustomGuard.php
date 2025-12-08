@@ -100,7 +100,7 @@ class CustomGuard implements StatefulGuard
 
     public function check()
     {
-        //Request pushes user back to null, so need to grab from session
+        //If already set on request then we don't need to fetch
         if ($this->hasUser()) {
             return true;
         }
@@ -133,8 +133,10 @@ class CustomGuard implements StatefulGuard
 
     public function guest()
     {
-        //NEED TO CHECK SESSION
-        return !$this->hasUser();
+        if ($this->check()) {
+            return false;
+        }
+        return true;
     }
 
     public function user()
@@ -160,7 +162,6 @@ class CustomGuard implements StatefulGuard
 
         // $this->user = $user;
         // return $this->user;
-        return null;
     }
 
     public function hasUser()
@@ -175,12 +176,11 @@ class CustomGuard implements StatefulGuard
 
     public function id()
     {
-        $exists = $this->hasUser();
-        if (!$exists) {
-            return null;
+        $exists = $this->check();
+        if ($exists) {
+            return $this->user->id;
         }
-        $user = $this->user();
-        return $user->id;
+        return null;
     }
 
     public function validate(array $credentials = [])
