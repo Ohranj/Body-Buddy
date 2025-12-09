@@ -1,7 +1,7 @@
 <script>
 import Auth from '../components/layouts/Auth.vue'
 import AuthHeader from '../components/AuthHeader.vue';
-import CaloriesContainer from '../components/CaloriesContainer.vue';
+import CaloriesProgress from '../components/CaloriesProgress.vue';
 import WeightContainer from '../components/WeightContainer.vue';
 import Modal from '../components/Modal.vue';
 import {checkOutsideElemClick} from '../helpers'
@@ -15,7 +15,7 @@ export default {
     components: {
         AuthHeader,
         AuthLayout: Auth,
-        CaloriesContainer,
+        CaloriesProgress,
         WeightContainer,
         Modal,
         Chevron,
@@ -27,6 +27,7 @@ export default {
     data() {
         return {
             checkOutsideElemClick,
+            calories: {},
             modals: {
                 calories: {
                     show: false,
@@ -55,6 +56,8 @@ export default {
         }
     },
     mounted() {
+        this.calories = this.$page.props.calories;
+        console.log(this.calories)
         document.addEventListener('click', (e) => {
             const insideTarget = this.checkOutsideElemClick(e, 'meal_dropdown');
             if (!insideTarget) {
@@ -78,7 +81,7 @@ export default {
             </ul>
 
             <div class="mt-12 flex flex-wrap gap-8">
-                <CaloriesContainer @toggle-modal="() => toggleModal('calories', true)" />
+                <CaloriesProgress :calories="calories" @toggle-modal="() => toggleModal('calories', true)" />
                 <WeightContainer @toggle-modal="() => toggleModal('weight', true)" />
             </div>
 
@@ -137,8 +140,7 @@ export default {
 
 
 
-            <!-- <small>Track favourite lifts progress</small> -->
-            <!-- <small>Calories</small>
+            <!-- <small>Track favourite lifts progress</small>
             <small>Body metrics</small>
             <small>Workout</small>
             <small>Timer</small>

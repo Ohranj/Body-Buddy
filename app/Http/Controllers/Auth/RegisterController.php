@@ -2,14 +2,17 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Http\Actions\Logs\InsertLog;
+use App\Http\Actions\CalorieTargets\CreateCalorieTarget;
+use Carbon\Carbon;
+use App\Models\User;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use App\Http\Requests\RegisterRequest;
-use App\Models\User;
 use App\Traits\JsonResponseTrait;
+use App\Http\Actions\Logs\InsertLog;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\RegisterRequest;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class RegisterController extends Controller
@@ -28,7 +31,7 @@ class RegisterController extends Controller
     /**
      * 
      */
-    public function store(RegisterRequest $request, InsertLog $insertLog): JsonResponse
+    public function store(RegisterRequest $request, InsertLog $insertLog, CreateCalorieTarget $createCalorieTarget): JsonResponse
     {
         $params = collect($request->all())->only(['forename', 'surname', 'email']);
         $user = User::create([...$params, ...['password' => $request->password_hashed]]);
@@ -38,6 +41,10 @@ class RegisterController extends Controller
         Auth::loginUsingId($user->id);
         $request->session()->regenerate();
         $insertLog->execute($user, 'LOGGED_IN');
+
+        $key = $createCalorieTarget->execute();
+        Log::info($key);
+        $insertLog->execute($user, 'NEW_CALORIE_TARGET');
 
         return $this->sendJsonResponse(true, 'Account created', [], [], 201);
     }
