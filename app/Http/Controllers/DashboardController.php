@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Actions\Calories\RetrieveCaloriesByDay;
-use App\Http\Actions\CalorieTargets\RetrieveLatestCalorieTarget;
+use App\Http\Actions\CalorieTargets\RetrieveCalorieTargetForDay;
+use App\Services\CaloriesService;
+use Exception;
 use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Http\Request;
@@ -12,28 +14,31 @@ use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
-    public function __invoke(Request $request, RetrieveCaloriesByDay $retrieveCaloriesByDay, RetrieveLatestCalorieTarget $retrieveLatestCalorieTarget): Response
+    public function __invoke(Request $request, RetrieveCaloriesByDay $retrieveCaloriesByDay, RetrieveCalorieTargetForDay $retrieveLatestCalorieTarget): Response
     {
-        $today = Carbon::today();
+        $today = Carbon::now();
 
         $calories = $retrieveCaloriesByDay->execute($today);
-        $calorieTarget = $retrieveLatestCalorieTarget->execute();
-        $totalCalories = $calories->reduce(fn($acc, $cur) => $acc += $cur->amount, 0);
-        $totalCaloriesPercent = round(($totalCalories / $calorieTarget->target) * 100, 1);
-        $caloriesRemaining = $calorieTarget->target - $totalCalories;
+        $calorieTarget = $retrieveLatestCalorieTarget->execute($today);
+        if ($calorieTarget == null) {
+            throw new Exception('Target not found');
+        }
+
+        $caloriesService = new CaloriesService($calories, $calorieTarget->target);
+        $caloriesService->sumCaloriesConsumed()->calculateCaloriesConsumedPercent()->sumRemainingCalories();
 
         return Inertia::render('Dashboard', [
             'user' => Auth::user(),
             'calories' => [
                 'entries' => $calories,
-                'total' => $totalCalories,
-                'percent' => $totalCaloriesPercent,
+                'total' => $caloriesService->consumed,
+                'percent' => $caloriesService->percentConsumed,
                 'dailyTarget' => [
                     'amount' => $calorieTarget->target,
                     'human_created' => Carbon::parse($calorieTarget->created_at)->format('M jS Y'),
                     'human_created_text' => Carbon::parse($calorieTarget->created_at)->diffForHumans()
                 ],
-                'remaining' => $caloriesRemaining
+                'remaining' => $caloriesService->remaining
             ],
             'date' => [
                 'human_day' => $today->format('l jS F Y'),
@@ -42,9 +47,3 @@ class DashboardController extends Controller
         ]);
     }
 }
-
-
-/**
- * Maybe move calories to a service class
- * Check null divide for percent calc
- */
