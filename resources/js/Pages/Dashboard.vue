@@ -10,6 +10,7 @@ import Bread from '../components/svg/Bread.vue';
 import Apple from '../components/svg/Apple.vue';
 import RiceBowl from '../components/svg/RiceBowl.vue';
 import Burger from '../components/svg/Burger.vue';
+import {notifications} from '../store'
 
 export default {
     components: {
@@ -26,16 +27,21 @@ export default {
     },
     data() {
         return {
+            notifications,
             checkOutsideElemClick,
             calories: {},
             modals: {
                 calories: {
                     show: false,
                     range: 500,
+                    time: '10:10',
                     meal: {
                         show: false,
                         value: 'snack'
                     }
+                },
+                calorieEntries: {
+                    show: false
                 },
                 weight: {
                     show: false
@@ -44,20 +50,48 @@ export default {
         }
     },
     methods: {
-        toggleModal(key, val) {
+        async retrieveCalories() {
+            const response = await fetch('/calories?timestamp=' + this.$page.props.date.timestamp);
+            const json = await response.json()
+            this.calories = json.data;
+        },
+        toggleModal(key, state) {
             if (key == 'calories') {
-                if (val) {
+                if (state) {
                     this.modals.calories.range = 500;
                     this.modals.calories.meal.show = false
                     this.modals.calories.meal.value = 'snack'
+                    this.modals.calories.time = `${new Date().getHours()}:00`
                 }
             }
-            this.modals[key].show = val
+            this.modals[key].show = state
+        },
+        async confirmCaloriesClicked() {
+            const response = await fetch('/calories', {
+                method: 'POST',
+                body: JSON.stringify(this.modals.calories),
+                headers: {
+                    'accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': this.$page.props.shared_token
+                }
+            })
+            const json = await response.json()
+            if (!response.ok) {
+                for (const [key, errors] of Object.entries(json.errors)) {
+                    for (const err of errors) {
+                        const notification = {success: false, message: err, show: true}
+                        this.notifications.add(notification)
+                    }
+                }
+                return
+            }
+            this.modals.calories.show = false;
+            this.retrieveCalories()
         }
     },
     mounted() {
-        this.calories = this.$page.props.calories;
-        console.log(this.calories)
+        Promise.all([this.retrieveCalories()])
         document.addEventListener('click', (e) => {
             const insideTarget = this.checkOutsideElemClick(e, 'meal_dropdown');
             if (!insideTarget) {
@@ -80,8 +114,23 @@ export default {
                 <li class="text-inherit">Last workout: </li>
             </ul>
 
+            <div class="w-fit mx-auto mt-12">
+                <div class="flex items-center justify-center md:justify-start gap-x-4">
+                    <Link :href="'/dashboard?timestamp=' + ($page.props.date.timestamp - 86400)" class="cursor-pointer hover:bg-zinc-800 rounded-md">
+                        <Chevron class="w-24 h-24 rotate-90" stroke="#FFFFFF" fill="none" />
+                    </Link>
+                    <Link :href="'/dashboard?timestamp=' + ($page.props.date.timestamp + 86400)" class="cursor-pointer hover:bg-zinc-800 rounded-md">
+                        <Chevron class="w-24 h-24 -rotate-90" stroke="#FFFFFF" fill="none" />
+                    </Link>
+                </div>
+                <small class="text-center block tracking-wide font-semibold mt-1 md:underline underline-offset-4">MOVE BETWEEN DAYS</small>
+            </div>
+
             <div class="mt-12 flex flex-wrap gap-8">
-                <CaloriesProgress :calories="calories" @toggle-modal="() => toggleModal('calories', true)" />
+                <CaloriesProgress 
+                    :calories="calories" 
+                    @toggle-update="() => toggleModal('calories', true)" 
+                    @toggle-entries="() => toggleModal('calorieEntries', true)" />
                 <WeightContainer @toggle-modal="() => toggleModal('weight', true)" />
             </div>
 
@@ -97,6 +146,11 @@ export default {
                             <small class="font-semibold text-[11px] sm:text-sm">Use the slider to append to your daily calories total.</small>
                             <input type="range" min="0" max="2000" step="10" class="accent-zinc-700 appearance-none cursor-pointer my-3" v-model="modals.calories.range" id="i_calories_range" />
                             <small class="font-semibold">Appending: <input type="number" class="px-1 min-w-[25px] rounded cursor-pointer" @click="(e) => e.target.select()" :style="{ width: modals.calories.range.toString().length * 10 + 'px' }" v-model="modals.calories.range" /></small>
+                        </div>
+                        <div class="mt-8 flex flex-col gap-y-1.5">
+                            <!-- ADD TIME TO ROW -->
+                            <small class="font-semibold text-[11px] sm:text-sm">Select a meal time.</small>
+                            <input type="time" class="w-fit text-xs font-semibold cursor-pointer" value="22:10" v-model="modals.calories.time" />
                         </div>
                         <div class="flex flex-col gap-y-1.5 mt-8 relative" id="meal_dropdown">
                             <small class="font-semibold text-[11px] sm:text-sm">Select a meal reference.</small>
@@ -121,13 +175,84 @@ export default {
                                 </div>
                             </div>
                         </div>
-                        <button class="bg-blue-500 hover:bg-blue-600 text-sm rounded px-2 py-1 self-end mt-4 cursor-pointer shadow shadow-black font-semibold text-white min-w-[95px]">Confirm</button>
+                        <button class="bg-blue-500 hover:bg-blue-600 text-sm rounded px-2 py-1 self-end mt-4 cursor-pointer shadow shadow-black font-semibold text-white min-w-[95px]" @click="confirmCaloriesClicked()">Confirm</button>
                         <div class="flex items-center gap-x-4 mt-4">
                             <div class="grow border-b-2 border-dashed text-red-500"></div>
                             <small class="text-red-500 font-semibold">Danger Zone</small>
                             <div class="grow border-b-2 border-dashed text-red-500"></div>
                         </div>
                         <button class="bg-red-500 hover:bg-red-600 text-sm mt-4 rounded px-2 py-1 font-semibold text-white shadow shadow-black self-end cursor-pointer">Reset Calories</button>
+                    </div>
+                </template>
+            </Modal>
+
+
+            <Modal :show="modals.calorieEntries.show" title="Calorie Entries" @toggle-modal="() => toggleModal('calorieEntries', false)">
+                <template v-slot:content>
+                    <div class="flex flex-col p-0.5 sm:p-4">
+                        <div class="min-h-[75px] overflow-y-scroll hide-scrollbar">
+                            <table class="w-full text-black text-xs">
+                                <thead>
+                                <tr class="font-semibold">
+                                    <th class="underline text-left">Meal</th>
+                                    <th class="underline">Calories</th>
+                                    <th class="hidden md:block underline">Running Total</th>
+                                    <th class="underline">Time</th>
+                                    <th class="underline">Manage</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                    <template v-for="(entry, index) of calories.entries">
+                                        <tr class="border-b border-zinc-300">
+                                            <td class="py-0.5 capitalize" v-text="entry.meal.toLowerCase()"></td>
+                                            <td class="py-0.5 text-center" v-text="entry.amount"></td>
+                                            <td class="hidden md:block py-0.5 text-center" v-text="entry.running_total"></td>
+                                            <td class="py-0.5 text-center" v-text="entry.human_date"></td>
+                                            <td class="py-0.5 text-center">rr</td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="text-sm mt-4">
+                            <h2 class="font-semibold text-xs">Overview:</h2>
+                            <div class="grid grid-cols-3 font-semibold">
+                                <small class="col-start-2 underline">Calories</small>
+                                <small class="underline">Percent</small>
+                            </div>
+                            <div>
+                                <div class="border-b border-zinc-300 grid grid-cols-3">
+                                    <small>Snacks:</small>
+                                    <small v-text="calories.mealTallies?.SNACK.amount"></small>
+                                    <small v-text="calories.mealTallies?.SNACK.percent + '%'"></small>
+                                </div>
+                                <div class="border-b border-zinc-300 grid grid-cols-3">
+                                    <small>Breakfast:</small>
+                                    <small v-text="calories.mealTallies?.BREAKFAST.amount"></small>
+                                    <small v-text="calories.mealTallies?.BREAKFAST.percent + '%'"></small>
+                                </div>
+                                <div class="border-b border-zinc-300 grid grid-cols-3">
+                                    <small>Lunch:</small>
+                                    <small v-text="calories.mealTallies?.LUNCH.amount"></small>
+                                    <small v-text="calories.mealTallies?.LUNCH.percent + '%'"></small>
+                                </div>
+                                <div class="border-b border-zinc-300 grid grid-cols-3">
+                                    <small>Dinner:</small>
+                                    <small v-text="calories.mealTallies?.DINNER.amount"></small>
+                                    <small v-text="calories.mealTallies?.DINNER.percent + '%'"></small>
+                                </div>
+                                <div class="border-b border-zinc-300 grid grid-cols-3 font-semibold">
+                                    <small>Total:</small>
+                                    <small v-text="calories.total"></small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-x-4 mt-4">
+                            <div class="grow border-b-2 border-dashed text-red-500"></div>
+                            <small class="text-red-500 font-semibold">Danger Zone</small>
+                            <div class="grow border-b-2 border-dashed text-red-500"></div>
+                        </div>
+                        <button class="bg-red-500 hover:bg-red-600 text-sm mt-4 rounded px-2 py-1 font-semibold text-white shadow shadow-black self-end cursor-pointer">Remove Entries</button>
                     </div>
                 </template>
             </Modal>
@@ -144,7 +269,7 @@ export default {
             <small>Body metrics</small>
             <small>Workout</small>
             <small>Timer</small>
-            <small>Calendar - can view old pages</small> -->
+            -->
         </template>
     </AuthLayout>
 </template>

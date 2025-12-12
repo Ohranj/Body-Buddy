@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('user_id');
             $table->unsignedSmallInteger('amount')->default(0);
             $table->string('meal')->default('snack');
-            $table->date('date')->default(Carbon::today());
+            $table->dateTime('date');
             $table->timestamps();
         });
     }

@@ -75,8 +75,15 @@ class CustomGuard implements StatefulGuard
 
     public function loginUsingId($id, $remember = false)
     {
-        dd('login using id');
-        throw new \Exception('Not implemented');
+        $sessionExpiresAt = Carbon::now()->addMinutes((int)config('session.lifetime'));
+        session([
+            self::PREFIX . '_user_id' => $id,
+            self::PREFIX . '_expires_at' => $sessionExpiresAt->getTimestampMs()
+        ]);
+        $guard = config('auth.defaults')['guard'];
+        $user = $this->user();
+        event(new Login(guard: $guard, user: $user, remember: $remember));
+        return $user;
     }
 
     public function onceUsingId($id)

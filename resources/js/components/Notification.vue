@@ -16,7 +16,7 @@ export default {
 </script>
 
 <template>
-    <div class="fixed space-y-1.5 w-full flex items-center flex-col justify-center z-10">
+    <div class="fixed space-y-1.5 w-full flex items-center flex-col justify-center z-100">
         <template v-for="(x, i) in notifications.items">
             <div v-show="x.show" class="flex flex-col w-5/6 sm:w-[375px] cursor-pointer shadow shadow-zinc-700 rounded-md p-1.5 relative" :class="x.success ? 'bg-lime-700' : 'bg-red-500 hover:bg-red-600'" @click="notificationClicked(i)">
                 <small class="font-semibold" v-text="x.success ? 'Success!' : 'Error!'"></small>

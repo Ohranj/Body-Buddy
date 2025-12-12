@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use Exception;
+use App\Models\Calories;
 use Illuminate\Support\Collection;
 
 class CaloriesService
@@ -10,8 +10,39 @@ class CaloriesService
     public $consumed = 0;
     public $percentConsumed = 0;
     public $remaining = 0;
+    public $mealTallies = [];
 
     public function __construct(private Collection $calorieEntries, private int $target) {}
+
+    /**
+     * 
+     */
+    public function tallyPerMeal(): CaloriesService
+    {
+        $types = [];
+        foreach (Calories::MEALS as $meal) {
+            $types[$meal['name']] = [
+                'amount' => 0,
+                'percent' => 0
+            ];
+        }
+
+        $this->sumCaloriesConsumed();
+
+        $this->mealTallies = $this->calorieEntries->reduce(function ($acc, $cur) {
+            $acc[$cur->meal]['amount'] += $cur->amount;
+            return $acc;
+        }, $types);
+
+        foreach ($this->mealTallies as $key => $meal) {
+            if ($meal['amount'] == 0) {
+                continue;
+            }
+            $this->mealTallies[$key]['percent'] = round(($meal['amount'] / $this->consumed) * 100, 1);
+        }
+
+        return $this;
+    }
 
     /**
      * 

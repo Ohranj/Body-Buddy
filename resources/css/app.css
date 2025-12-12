@@ -20,6 +20,10 @@
     input[type="number"] {
         -moz-appearance: textfield;
     }
+
+    .hide-scrollbar {
+        @apply [scrollbar-width:none] [&::-webkit-scrollbar]:hidden;
+    }
 }
 
 .fade-enter-active,

@@ -1,9 +1,10 @@
 <script>
 import Pen from './svg/Pen.vue';
+import Clipboard from './svg/Clipboard.vue'
 
 export default {
     components: {
-        Pen
+        Pen, Clipboard
     },
     emits: ['toggleModal'],
     data() {
@@ -24,7 +25,7 @@ export default {
         await new Promise((res) => setTimeout(() => res(), 500))
 
         while (this.progress.bar.width < target) {
-            await new Promise((res) => setTimeout(() => res(), 35))
+            await new Promise((res) => setTimeout(() => res(), 20))
             this.progress.bar.width += 1;
         }
         this.progress.count.show = true
@@ -49,8 +50,11 @@ export default {
                 </div>
                 <small class="block text-right relative right-2"><span>3kg</span> remaining.</small>
             </div>
-            <div>
-                <button class="mx-auto rounded-md p-1.5 font-semibold min-w-[75px] bg-zinc-300 text-black shadow shadow-slate-500 cursor-pointer hover:bg-zinc-400 text-sm flex items-center gap-x-2" @click="$emit('toggleModal')">
+            <div class="flex items-center gap-x-4 justify-center">
+                <button class="rounded-md p-1.5 font-semibold min-w-[75px] bg-zinc-300 text-black shadow shadow-slate-500 cursor-pointer hover:bg-zinc-400 text-sm flex items-center gap-x-1.5" @click="$emit('toggleModal')">
+                    <Clipboard class="w-5 h-5" stroke="#000000" fill="none" />History
+                </button>
+                <button class="rounded-md p-1.5 font-semibold min-w-[75px] bg-zinc-300 text-black shadow shadow-slate-500 cursor-pointer hover:bg-zinc-400 text-sm flex items-center gap-x-1.5" @click="$emit('toggleModal')">
                     <Pen class="w-5 h-5" stroke="#000000" fill="none" />Update
                 </button>
             </div>
