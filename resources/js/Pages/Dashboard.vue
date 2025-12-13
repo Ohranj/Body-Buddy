@@ -105,6 +105,30 @@ export default {
             this.modals.calories.show = false;
             this.retrieveCalories()
         },
+        async onRemoveEntries() {
+            const ids = this.calories.entries.reduce((acc, cur) => {
+                if (cur.toggled) acc.push(cur.id)
+                return acc;
+            }, [])
+            const responses = await Promise.all(ids.map((x) => this.deleteEntry(x)))
+            for (const x of responses) {
+                const notification = {success: x.success, message: x.message, show: true}
+                this.notifications.add(notification)
+            } 
+            await this.retrieveCalories()
+        },
+        async deleteEntry(id) {
+            const response = await fetch('/calories/' + id, {
+                method: 'DELETE',
+                headers: {
+                    'accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': this.$page.props.shared_token
+                }
+            })
+            const json = await response.json()
+            return json;
+        }
     },
     computed: {
         deleteSelectedEntries() {
@@ -213,13 +237,13 @@ export default {
                                 </thead>
                                 <tbody>
                                     <template v-for="(entry, index) of calories.entries">
-                                        <tr class="border-b border-zinc-300" :class="{'bg-red-200': entry.toggled}">
+                                        <tr class="hover:bg-zinc-200 border-b border-zinc-300" :class="{'bg-red-200': entry.toggled}">
                                             <td class="py-0.75 capitalize" v-text="entry.meal.toLowerCase()"></td>
                                             <td class="py-0.75 text-center" v-text="entry.amount"></td>
                                             <td class="hidden md:block py-0.75 text-center" v-text="entry.running_total"></td>
                                             <td class="py-0.75 text-center" v-text="entry.human_date"></td>
                                             <td class="py-0.75 text-center">
-                                                <button class="cursor-pointer" @click="entry.toggled = !entry.toggled"><Close class="w-4 h-4" stroke="red" fill="none" /></button>
+                                                <button class="cursor-pointer hover:scale-[1.25]" @click="entry.toggled = !entry.toggled"><Close class="w-4 h-4" stroke="red" fill="none" /></button>
                                             </td>
                                         </tr>
                                     </template>
@@ -237,7 +261,7 @@ export default {
                                 </Transition>
                             </table>
                             <Transition name="fade">
-                                <button class="bg-blue-500 hover:bg-blue-600 text-sm mx-1 mt-3 mb-1 ml-auto rounded px-2 py-1 font-semibold text-white shadow shadow-black block cursor-pointer" v-show="deleteSelectedEntries > 0">Remove</button>
+                                <button class="bg-blue-500 hover:bg-blue-600 text-sm mx-1 mt-3 mb-1 ml-auto rounded px-2 py-1 font-semibold text-white shadow shadow-black block cursor-pointer" v-show="deleteSelectedEntries > 0" @click="onRemoveEntries">Remove</button>
                             </Transition>
                             <div v-show="calories.entries?.length == 0" class="flex flex-col items-center my-4 justify-center">
                                 <Close class="w-6 h-6" stroke="#000000" fill="none" />

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Actions\Calories\DeleteCalorieEntryById;
 use Exception;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -79,8 +80,12 @@ class CaloriesController extends Controller
     /**
      * 
      */
-    public function destroy(Request $request)
+    public function destroy(Request $request, int $id, DeleteCalorieEntryById $deleteCalorieEntryById)
     {
-        dd(2);
+        $rows = $deleteCalorieEntryById->execute($id, Auth::id());
+        if ($rows == 0) {
+            return $this->sendJsonResponse(false, 'Failed to trash entry', [], [], 422);
+        }
+        return $this->sendJsonResponse(true, 'Entry trashed', [], [], 201);
     }
 }

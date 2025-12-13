@@ -22,14 +22,29 @@ export default {
     },
     methods: {
         async animateProgress() {
+            this.progress.count.show = false;
             const target = this.calories.percent;
             await new Promise((res) => setTimeout(() => res(), 500))
 
+            if (this.progress.bar.width > target) {
+                await this.decrementBar(target)
+            } else {
+                await this.incrementBar(target)
+            }
+
+            this.progress.count.show = true
+        },
+        async decrementBar(target) {
+            while (this.progress.bar.width > target) {
+                await new Promise((res) => setTimeout(() => res(), 20))
+                this.progress.bar.width -= 1;
+            }
+        },
+        async incrementBar(target) {
             while (this.progress.bar.width < target) {
                 await new Promise((res) => setTimeout(() => res(), 20))
                 this.progress.bar.width += 1;
             }
-            this.progress.count.show = true
         }
     },
     watch: {
