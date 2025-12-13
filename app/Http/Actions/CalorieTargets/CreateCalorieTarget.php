@@ -8,9 +8,11 @@ use Illuminate\Support\Facades\Auth;
 
 class CreateCalorieTarget
 {
-    public function execute($target = 2500): int
+    public function execute($target = 2500, $date = null): int
     {
-        $dateNow = Carbon::now();
-        return DB::table('calorie_targets')->insertGetId(['user_id' => Auth::id(), 'target' => $target, 'created_at' => $dateNow, 'updated_at' => $dateNow]);
+        if ($date == null) {
+            $date = Carbon::now();
+        }
+        return DB::table('calorie_targets')->insertGetId(['user_id' => Auth::id(), 'target' => $target, 'created_at' => Carbon::now(), 'updated_at' => $date]);
     }
 }

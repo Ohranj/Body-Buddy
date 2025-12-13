@@ -11,6 +11,7 @@ import Apple from '../components/svg/Apple.vue';
 import RiceBowl from '../components/svg/RiceBowl.vue';
 import Burger from '../components/svg/Burger.vue';
 import {notifications} from '../store'
+import Close from '../components/svg/Close.vue';
 
 export default {
     components: {
@@ -23,7 +24,8 @@ export default {
         Bread,
         Apple,
         RiceBowl,
-        Burger
+        Burger,
+        Close
     },
     data() {
         return {
@@ -61,13 +63,17 @@ export default {
                     this.modals.calories.range = 500;
                     this.modals.calories.meal.show = false
                     this.modals.calories.meal.value = 'snack'
-                    this.modals.calories.time = `${new Date().getHours()}:00`
+                    let hours = new Date().getHours();
+                    if (hours < 10) {
+                        hours = `0${hours}`
+                    }
+                    this.modals.calories.time = `${hours}:00`
                 }
             }
             this.modals[key].show = state
         },
         async confirmCaloriesClicked() {
-            const response = await fetch('/calories', {
+            const response = await fetch('/calories?timestamp=' + this.$page.props.date.timestamp, {
                 method: 'POST',
                 body: JSON.stringify(this.modals.calories),
                 headers: {
@@ -213,6 +219,10 @@ export default {
                                     </template>
                                 </tbody>
                             </table>
+                            <div v-show="calories.entries?.length == 0" class="flex flex-col items-center my-4 justify-center">
+                                <Close class="w-6 h-6" stroke="#000000" fill="none" />
+                                <small>No entries found</small>
+                            </div>
                         </div>
                         <div class="text-sm mt-4">
                             <h2 class="font-semibold text-xs">Overview:</h2>
@@ -252,7 +262,7 @@ export default {
                             <small class="text-red-500 font-semibold">Danger Zone</small>
                             <div class="grow border-b-2 border-dashed text-red-500"></div>
                         </div>
-                        <button class="bg-red-500 hover:bg-red-600 text-sm mt-4 rounded px-2 py-1 font-semibold text-white shadow shadow-black self-end cursor-pointer">Remove Entries</button>
+                        <button class="bg-red-500 hover:bg-red-600 text-sm mt-4 rounded px-2 py-1 font-semibold text-white shadow shadow-black self-end" :class="{'cursor-pointer': calories.entries?.length >= 1}" :disabled="calories.entries?.length == 0">Remove Entries</button>
                     </div>
                 </template>
             </Modal>

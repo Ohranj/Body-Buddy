@@ -21,10 +21,18 @@ class CreateCaloriesRequest extends FormRequest
      */
     public function prepareForValidation()
     {
+
+        $insertDate = Carbon::parse($this->time)->shiftTimezone('Europe/London')->setTimezone('UTC');
+        if ($this->has('timestamp')) {
+            $day = Carbon::createFromTimestamp($this->timestamp);
+            $dayDate = $day->toDateString();
+            $insertDate = Carbon::parse($dayDate . $this->time);
+        }
+
         $this->merge([
             'amount' => $this->range,
             'meal' => strtoupper($this->meal['value']),
-            'date' => Carbon::parse($this->time)->shiftTimezone('Europe/London')->setTimezone('UTC'),
+            'date' => $insertDate
         ]);
     }
 
@@ -36,7 +44,7 @@ class CreateCaloriesRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'amount' => ['required', 'numeric', 'max:3000'],
+            'amount' => ['required', 'numeric', 'min:1', 'max:3000'],
             'meal' => ['required', 'string', function ($attribute, $value, $fail) {
                 $meals = [];
                 foreach (Calories::MEALS as $meal) {
@@ -56,6 +64,7 @@ class CreateCaloriesRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'amount.min' => 'Calories to append must exceed 0',
             'amount.max' => 'Calories to append must not exceed 3000',
         ];
     }

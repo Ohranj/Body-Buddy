@@ -53,8 +53,8 @@ class CaloriesController extends Controller
             'mealTallies' => $caloriesService->mealTallies,
             'dailyTarget' => [
                 'amount' => $calorieTarget->target,
-                'human_created' => Carbon::parse($calorieTarget->created_at)->format('M jS Y'),
-                'human_created_text' => Carbon::parse($calorieTarget->created_at)->diffForHumans()
+                'human_created' => Carbon::parse($calorieTarget->updated_at)->format('M jS Y'),
+                'human_created_text' => Carbon::parse($calorieTarget->updated_at)->diffForHumans()
             ],
             'remaining' => $caloriesService->remaining
         ];
