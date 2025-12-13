@@ -39,10 +39,10 @@ export default {
             <div class="font-semibold min-w-[200px] absolute top-full z-10 right-0 flex flex-col bg-white rounded-md p-0 overflow-hidden text-black transition-[max-height] duration-750 linear shadow shadow-slate-500"
                 :class="show ? 'max-h-[300px]' : 'max-h-0'">
                 <div class="flex flex-col">
-                    <div class="hover:bg-slate-300 p-1.5 cursor-pointer flex items-center gap-x-2">
+                    <Link href="/profile" class="hover:bg-slate-300 p-1.5 cursor-pointer flex items-center gap-x-2">
                         <Profile class="w-4 h-4" stroke="#000000" fill="none" />
                         <small>My Profile</small>
-                    </div>
+                    </Link>
                     <div class="hover:bg-slate-300 p-1.5 cursor-pointer flex items-center gap-x-2">
                         <Cog class="w-4 h-4" stroke="#000000" fill="none" />
                         <small>Settings & Security</small>

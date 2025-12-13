@@ -63,7 +63,7 @@ export default {
         <h1 class="text-lg font-semibold tracking-wide">Calories:</h1>
         <div class="grow grid grid-cols-1 grid-rows-3">
             <div class="flex flex-col">
-                <small>Your current daily target is: <span class="font-semibold underline underline-offset-2" v-text="calories.dailyTarget?.amount"></span>.</small>
+                <small>Your current daily target is: <Link href="/profile" class="hover:decoration-lime-600 font-semibold underline underline-offset-2" v-text="calories.dailyTarget?.amount"></Link>.</small>
                 <small v-show="calories.total == 0" class="text-red-500">You have not added any calories towards today.</small>
             </div>
             <div>
@@ -83,6 +83,6 @@ export default {
                 </button>
             </div>
         </div>
-        <small class="text-lime-600 absolute right-2 top-2"><sup>*</sup>Target updated: <span v-text="calories.dailyTarget?.human_created"></span></small>
+        <Link href="profile" class="text-lime-600 absolute right-2 top-2 text-xs hover:underline underline-offset-2"><sup>*</sup>Target updated: <span v-text="calories.dailyTarget?.human_created"></span></Link>
     </div>
 </template>
