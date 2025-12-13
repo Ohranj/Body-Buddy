@@ -22,12 +22,8 @@ class CreateCaloriesRequest extends FormRequest
     public function prepareForValidation()
     {
 
-        $insertDate = Carbon::parse($this->time)->shiftTimezone('Europe/London')->setTimezone('UTC');
-        if ($this->has('timestamp')) {
-            $day = Carbon::createFromTimestamp($this->timestamp);
-            $dayDate = $day->toDateString();
-            $insertDate = Carbon::parse($dayDate . $this->time);
-        }
+        $dayDate = $this->day->toDateString();
+        $insertDate = Carbon::parse($dayDate . $this->time);
 
         $this->merge([
             'amount' => $this->range,

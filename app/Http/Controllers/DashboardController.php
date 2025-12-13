@@ -12,11 +12,7 @@ class DashboardController extends Controller
 {
     public function __invoke(Request $request): Response
     {
-        $day = Carbon::now();
-
-        if ($request->has('timestamp')) {
-            $day = Carbon::createFromTimestamp($request->timestamp);
-        }
+        $day = $request->day;
 
         return Inertia::render('Dashboard', [
             'user' => Auth::user(),

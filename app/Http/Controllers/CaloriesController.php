@@ -23,11 +23,7 @@ class CaloriesController extends Controller
      */
     public function index(Request $request, RetrieveCaloriesByDay $retrieveCaloriesByDay, RetrieveCalorieTargetForDay $retrieveCalorieTargetForDay): JsonResponse
     {
-        $day = Carbon::now();
-
-        if ($request->has('timestamp')) {
-            $day = Carbon::createFromTimestamp($request->timestamp);
-        }
+        $day = $request->day;
 
         $calories = $retrieveCaloriesByDay->execute($day);
 
@@ -36,6 +32,7 @@ class CaloriesController extends Controller
             $entry->human_date = Carbon::parse($entry->date)->setTimezone('Europe/London')->format('H:ia');
             $runningTotal += $entry->amount;
             $entry->running_total = $runningTotal;
+            $entry->toggled = false;
         }
 
         $calorieTarget = $retrieveCalorieTargetForDay->execute($day);
@@ -77,5 +74,13 @@ class CaloriesController extends Controller
         ]);
 
         return $this->sendJsonResponse(true, 'Calories assigned', [], [], 201);
+    }
+
+    /**
+     * 
+     */
+    public function destroy(Request $request)
+    {
+        dd(2);
     }
 }

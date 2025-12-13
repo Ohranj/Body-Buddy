@@ -11,8 +11,26 @@ class RetrieveCaloriesByDay
 
     public function execute($day = null): Collection
     {
-        $start = $day->startOfDay()->toDateTimeString();
-        $end = $day->endOfDay()->toDateTimeString();
-        return DB::table('calories')->where('user_id', Auth::id())->whereBetween('date', [$start, $end])->get();
+        $start = $this->getStartDate($day);
+        $end = $this->getEndDate($day);
+        return DB::table('calories')->where('user_id', Auth::id())
+            ->whereBetween('date', [$start, $end])->orderBy('date', 'asc')
+            ->get();
+    }
+
+    /**
+     * 
+     */
+    private function getStartDate($day): string
+    {
+        return $day->startOfDay()->toDateTimeString();
+    }
+
+    /**
+     * 
+     */
+    private function getEndDate($day): string
+    {
+        return $day->endOfDay()->toDateTimeString();
     }
 }

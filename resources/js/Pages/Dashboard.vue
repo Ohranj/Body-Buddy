@@ -12,6 +12,7 @@ import RiceBowl from '../components/svg/RiceBowl.vue';
 import Burger from '../components/svg/Burger.vue';
 import {notifications} from '../store'
 import Close from '../components/svg/Close.vue';
+import SwitchDateBanner from '../components/SwitchDateBanner.vue';
 
 export default {
     components: {
@@ -25,7 +26,8 @@ export default {
         Apple,
         RiceBowl,
         Burger,
-        Close
+        Close,
+        SwitchDateBanner
     },
     data() {
         return {
@@ -43,7 +45,8 @@ export default {
                     }
                 },
                 calorieEntries: {
-                    show: false
+                    show: false,
+                    calsToRemove: 0
                 },
                 weight: {
                     show: false
@@ -70,6 +73,13 @@ export default {
                     this.modals.calories.time = `${hours}:00`
                 }
             }
+            if (key == 'calorieEntries') {
+                if (state) {
+                    for (const x of this.calories.entries) {
+                        x.toggled = false;
+                    }
+                }
+            }
             this.modals[key].show = state
         },
         async confirmCaloriesClicked() {
@@ -94,6 +104,11 @@ export default {
             }
             this.modals.calories.show = false;
             this.retrieveCalories()
+        },
+    },
+    computed: {
+        deleteSelectedEntries() {
+            return this.calories?.entries?.reduce((acc, cur) => cur.toggled ? acc += cur.amount : acc, 0);
         }
     },
     mounted() {
@@ -102,7 +117,7 @@ export default {
             const insideTarget = this.checkOutsideElemClick(e, 'meal_dropdown');
             if (!insideTarget) {
                 this.modals.calories.meal.show = false;
-            }
+             }
         })
     }
 }
@@ -120,17 +135,7 @@ export default {
                 <li class="text-inherit">Last workout: </li>
             </ul>
 
-            <div class="w-fit mx-auto mt-12">
-                <div class="flex items-center justify-center md:justify-start gap-x-4">
-                    <Link :href="'/dashboard?timestamp=' + ($page.props.date.timestamp - 86400)" class="cursor-pointer hover:bg-zinc-800 rounded-md">
-                        <Chevron class="w-24 h-24 rotate-90" stroke="#FFFFFF" fill="none" />
-                    </Link>
-                    <Link :href="'/dashboard?timestamp=' + ($page.props.date.timestamp + 86400)" class="cursor-pointer hover:bg-zinc-800 rounded-md">
-                        <Chevron class="w-24 h-24 -rotate-90" stroke="#FFFFFF" fill="none" />
-                    </Link>
-                </div>
-                <small class="text-center block tracking-wide font-semibold mt-1 md:underline underline-offset-4">MOVE BETWEEN DAYS</small>
-            </div>
+            <SwitchDateBanner :timestamp="$page.props.date.timestamp" />
 
             <div class="mt-12 flex flex-wrap gap-8">
                 <CaloriesProgress 
@@ -192,7 +197,6 @@ export default {
                 </template>
             </Modal>
 
-
             <Modal :show="modals.calorieEntries.show" title="Calorie Entries" @toggle-modal="() => toggleModal('calorieEntries', false)">
                 <template v-slot:content>
                     <div class="flex flex-col p-0.5 sm:p-4">
@@ -204,21 +208,37 @@ export default {
                                     <th class="underline">Calories</th>
                                     <th class="hidden md:block underline">Running Total</th>
                                     <th class="underline">Time</th>
-                                    <th class="underline">Manage</th>
+                                    <th class="underline">Remove</th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                     <template v-for="(entry, index) of calories.entries">
-                                        <tr class="border-b border-zinc-300">
-                                            <td class="py-0.5 capitalize" v-text="entry.meal.toLowerCase()"></td>
-                                            <td class="py-0.5 text-center" v-text="entry.amount"></td>
-                                            <td class="hidden md:block py-0.5 text-center" v-text="entry.running_total"></td>
-                                            <td class="py-0.5 text-center" v-text="entry.human_date"></td>
-                                            <td class="py-0.5 text-center">rr</td>
+                                        <tr class="border-b border-zinc-300" :class="{'bg-red-200': entry.toggled}">
+                                            <td class="py-0.75 capitalize" v-text="entry.meal.toLowerCase()"></td>
+                                            <td class="py-0.75 text-center" v-text="entry.amount"></td>
+                                            <td class="hidden md:block py-0.75 text-center" v-text="entry.running_total"></td>
+                                            <td class="py-0.75 text-center" v-text="entry.human_date"></td>
+                                            <td class="py-0.75 text-center">
+                                                <button class="cursor-pointer" @click="entry.toggled = !entry.toggled"><Close class="w-4 h-4" stroke="red" fill="none" /></button>
+                                            </td>
                                         </tr>
                                     </template>
                                 </tbody>
+                                <Transition name="fade">
+                                    <tfoot v-show="deleteSelectedEntries > 0" class="mt-5 pt-5">
+                                        <tr class="bg-blue-200">
+                                            <td class="uppercase">To remove</td>
+                                            <td class="py-0.75 text-center" v-text="deleteSelectedEntries"></td>
+                                            <td class="hidden md:block py-0.75 text-center" v-text="calories.total - deleteSelectedEntries"></td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                    </tfoot>
+                                </Transition>
                             </table>
+                            <Transition name="fade">
+                                <button class="bg-blue-500 hover:bg-blue-600 text-sm mx-1 mt-3 mb-1 ml-auto rounded px-2 py-1 font-semibold text-white shadow shadow-black block cursor-pointer" v-show="deleteSelectedEntries > 0">Remove</button>
+                            </Transition>
                             <div v-show="calories.entries?.length == 0" class="flex flex-col items-center my-4 justify-center">
                                 <Close class="w-6 h-6" stroke="#000000" fill="none" />
                                 <small>No entries found</small>
@@ -262,7 +282,7 @@ export default {
                             <small class="text-red-500 font-semibold">Danger Zone</small>
                             <div class="grow border-b-2 border-dashed text-red-500"></div>
                         </div>
-                        <button class="bg-red-500 hover:bg-red-600 text-sm mt-4 rounded px-2 py-1 font-semibold text-white shadow shadow-black self-end" :class="{'cursor-pointer': calories.entries?.length >= 1}" :disabled="calories.entries?.length == 0">Remove Entries</button>
+                        <button class="bg-red-500 hover:bg-red-600 text-sm mt-4 rounded px-2 py-1 font-semibold text-white shadow shadow-black self-end" :class="{'cursor-pointer': calories.entries?.length >= 1}" :disabled="calories.entries?.length == 0">Remove All</button>
                     </div>
                 </template>
             </Modal>
@@ -273,6 +293,8 @@ export default {
                 </template>
             </Modal>
 
+
+            <!-- Add delete of entries - Delete all done on queue with the websocket? -->
 
 
             <!-- <small>Track favourite lifts progress</small>
