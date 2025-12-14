@@ -8,6 +8,7 @@ use App\Traits\JsonResponseTrait;
 use App\Http\Actions\Logs\InsertLog;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Actions\CalorieTargets\CreateCalorieTarget;
+use Illuminate\Http\JsonResponse;
 
 class CalorieTargetController extends Controller
 {
@@ -16,7 +17,7 @@ class CalorieTargetController extends Controller
     /**
      * 
      */
-    public function store(Request $request, InsertLog $insertLog, CreateCalorieTarget $createCalorieTarget)
+    public function store(Request $request, InsertLog $insertLog, CreateCalorieTarget $createCalorieTarget): JsonResponse
     {
         $target = $request->target;
         $key = $createCalorieTarget->execute($target, Carbon::today());

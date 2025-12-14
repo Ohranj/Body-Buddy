@@ -46,7 +46,7 @@ export default {
         <template v-slot:main>
             <Link href="/dashboard" class="text-xs font-semibold hover:underline underline-offset-2 decoration-lime-600 flex items-center gap-x-1"><Chevron class="w-3.5 h-3.5 rotate-90" stroke="#FFFFFF" fill="none" />Return to Dashboard</Link>
             <div class="space-y-10 mt-20">
-                <div class="flex items-end justify-between">
+                <div class="flex items-end justify-between gap-x-4">
                     <div class="flex flex-col text-xs space-y-1 font-semibold">
                         <label>Amend your daily calorie target. This change takes effect from today onwards.</label>
                         <input type="number" class="border w-[75px] text-center p-1 rounded-md cursor-pointer" v-model="calorieTarget.target" @click="(e) => e.target.select()" />
