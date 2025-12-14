@@ -183,7 +183,6 @@ export default {
                             <small class="font-semibold">Appending: <input type="number" class="px-1 min-w-[25px] rounded cursor-pointer" @click="(e) => e.target.select()" :style="{ width: modals.calories.range.toString().length * 10 + 'px' }" v-model="modals.calories.range" /></small>
                         </div>
                         <div class="mt-8 flex flex-col gap-y-1.5">
-                            <!-- ADD TIME TO ROW -->
                             <small class="font-semibold text-[11px] sm:text-sm">Select a meal time.</small>
                             <input type="time" class="w-fit text-xs font-semibold cursor-pointer" value="22:10" v-model="modals.calories.time" />
                         </div>

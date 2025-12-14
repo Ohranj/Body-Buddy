@@ -10,8 +10,8 @@ class RetrieveCalorieTargetForDay
     public function execute($day)
     {
         return DB::table('calorie_targets')->where([
-            ['id', Auth::id()],
+            ['user_id', Auth::id()],
             ['created_at', '<=', $day]
-        ])->orderBy('created_at', 'desc')->first();
+        ])->orderBy('created_at', 'desc')->orderBy('id', 'desc')->first();
     }
 }

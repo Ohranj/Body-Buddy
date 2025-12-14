@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CaloriesController;
+use App\Http\Controllers\CalorieTargetController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Middleware\AddTimestampToRequest;
@@ -11,6 +12,7 @@ Route::group(['middleware' => ['auth', AddTimestampToRequest::class]], function 
     Route::get('/dashboard', DashboardController::class);
     Route::get('/profile', ProfileController::class);
     Route::resource('/calories', CaloriesController::class);
+    Route::resource('/calorietarget', CalorieTargetController::class);
 });
 
 Route::inertia('/test', 'Test');

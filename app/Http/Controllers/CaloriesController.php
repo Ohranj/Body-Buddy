@@ -36,7 +36,7 @@ class CaloriesController extends Controller
             $entry->toggled = false;
         }
 
-        $calorieTarget = $retrieveCalorieTargetForDay->execute($day);
+        $calorieTarget = $retrieveCalorieTargetForDay->execute($day->startOfDay());
         if ($calorieTarget == null) {
             throw new Exception('Target not found');
         }

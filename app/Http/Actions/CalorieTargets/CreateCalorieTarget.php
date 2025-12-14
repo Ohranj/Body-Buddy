@@ -13,6 +13,6 @@ class CreateCalorieTarget
         if ($date == null) {
             $date = Carbon::now();
         }
-        return DB::table('calorie_targets')->insertGetId(['user_id' => Auth::id(), 'target' => $target, 'created_at' => Carbon::now(), 'updated_at' => $date]);
+        return DB::table('calorie_targets')->insertGetId(['user_id' => Auth::id(), 'target' => $target, 'created_at' => $date, 'updated_at' => $date]);
     }
 }
