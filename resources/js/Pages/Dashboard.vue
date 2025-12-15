@@ -235,7 +235,7 @@ export default {
                                 </tr>
                                 </thead>
                                 <tbody>
-                                    <template v-for="(entry, index) of calories.entries">
+                                    <template v-for="(entry, index) of calories.entries" :key="entry.id">
                                         <tr class="hover:bg-zinc-200 border-b border-zinc-300" :class="{'bg-red-200': entry.toggled}">
                                             <td class="py-0.75 capitalize" v-text="entry.meal.toLowerCase()"></td>
                                             <td class="py-0.75 text-center" v-text="entry.amount"></td>
