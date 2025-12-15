@@ -4,15 +4,19 @@ namespace App\Http\Actions\CalorieTargets;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
 
 class CreateCalorieTarget
 {
-    public function execute($target = 2500, $date = null): int
+    public function execute(int $user, int $target = 2500, $take_effect = null): int
     {
-        if ($date == null) {
-            $date = Carbon::now();
+        if ($take_effect == null) {
+            $take_effect = Carbon::today()->startOfDay();
         }
-        return DB::table('calorie_targets')->insertGetId(['user_id' => Auth::id(), 'target' => $target, 'created_at' => $date, 'updated_at' => $date]);
+
+        return DB::table('calorie_targets')
+            ->updateOrInsert(
+                ['user_id' => $user, 'take_effect' => $take_effect],
+                ['target' => $target, 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()]
+            );
     }
 }

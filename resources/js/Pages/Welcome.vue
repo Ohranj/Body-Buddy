@@ -13,6 +13,7 @@ export default {
     },
     data() {
         return {
+            controller: null,
             notifications,
             showMainSpinner: false,
             forms: {
@@ -45,11 +46,14 @@ export default {
             const notification = {success: true, message: json.message, show: true}
             this.notifications.add(notification)
             this.showMainSpinner = true;
+            this.controller.abort()
             await new Promise((res) => setTimeout(() => res(), 2500))
             router.visit('/dashboard');
         }
     },
-    mounted() {
+    created() {
+        this.controller = new AbortController()
+        const {signal} = this.controller;
         document.addEventListener('keypress', (e) => {
             if (e.key != 'Enter') {
                 return;
@@ -58,7 +62,7 @@ export default {
                 return 
             }
             this.onLoginSubmit()
-        })
+        }, {signal})
     }
 }
 </script>

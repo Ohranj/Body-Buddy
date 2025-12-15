@@ -135,7 +135,7 @@ export default {
             return this.calories?.entries?.reduce((acc, cur) => cur.toggled ? acc += cur.amount : acc, 0);
         }
     },
-    mounted() {
+    created() {
         Promise.all([this.retrieveCalories()])
         document.addEventListener('click', (e) => {
             const insideTarget = this.checkOutsideElemClick(e, 'meal_dropdown');
@@ -315,6 +315,12 @@ export default {
                     WEight
                 </template>
             </Modal>
+
+
+            <!-- Add a weight table where you log weight updates  -->
+            <!-- Add a target weight table where you have a starting weight and target weight - Not sure whether to have a single or multi setup -->
+             
+
 
 
             <!-- Add delete of entries - Delete all done on queue with the websocket? -->

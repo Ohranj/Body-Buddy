@@ -3,11 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use App\Traits\JsonResponseTrait;
 use App\Http\Actions\Logs\InsertLog;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Actions\CalorieTargets\CreateCalorieTarget;
+use App\Http\Requests\CalorieTargets\CreateCalorieTargetRequest;
 use Illuminate\Http\JsonResponse;
 
 class CalorieTargetController extends Controller
@@ -17,11 +17,11 @@ class CalorieTargetController extends Controller
     /**
      * 
      */
-    public function store(Request $request, InsertLog $insertLog, CreateCalorieTarget $createCalorieTarget): JsonResponse
+    public function store(CreateCalorieTargetRequest $createCalorieTargetRequest, InsertLog $insertLog, CreateCalorieTarget $createCalorieTarget): JsonResponse
     {
-        $target = $request->target;
-        $key = $createCalorieTarget->execute($target, Carbon::today());
-        $insertLog->execute(Auth::user(), 'NEW_CALORIE_TARGET');
-        return $this->sendJsonResponse(true, 'Calorie target updated', [], [], 201);
+        ['target' => $target, 'formattedDate' => $formattedDate] = $createCalorieTargetRequest->validated();
+        $key = $createCalorieTarget->execute(user: Auth::id(), target: $target, take_effect: $formattedDate);
+        $insertLog->execute(model: Auth::user(), activity: 'NEW_CALORIE_TARGET');
+        return $this->sendJsonResponse(state: true, message: 'Calorie target updated', errors: [], data: [], status: 201);
     }
 }

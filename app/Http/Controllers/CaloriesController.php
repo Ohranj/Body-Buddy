@@ -26,7 +26,7 @@ class CaloriesController extends Controller
     {
         $day = $request->day;
 
-        $calories = $retrieveCaloriesByDay->execute($day);
+        $calories = $retrieveCaloriesByDay->execute(user: Auth::id(), day: $day);
 
         $runningTotal = 0;
         foreach ($calories as $entry) {
@@ -36,7 +36,7 @@ class CaloriesController extends Controller
             $entry->toggled = false;
         }
 
-        $calorieTarget = $retrieveCalorieTargetForDay->execute($day->startOfDay());
+        $calorieTarget = $retrieveCalorieTargetForDay->execute(user: Auth::id(), day: $day->startOfDay());
         if ($calorieTarget == null) {
             throw new Exception('Target not found');
         }
@@ -57,7 +57,7 @@ class CaloriesController extends Controller
             'remaining' => $caloriesService->remaining
         ];
 
-        return $this->sendJsonResponse(true, 'Calories retrieved', [], $data, 200);
+        return $this->sendJsonResponse(state: true, message: 'Calories retrieved', errors: [], data: $data, status: 200);
     }
 
     /**
@@ -74,7 +74,7 @@ class CaloriesController extends Controller
             'updated_at' => $created
         ]);
 
-        return $this->sendJsonResponse(true, 'Calories assigned', [], [], 201);
+        return $this->sendJsonResponse(state: true, message: 'Calories assigned', errors: [], data: [], status: 201);
     }
 
     /**
@@ -82,10 +82,10 @@ class CaloriesController extends Controller
      */
     public function destroy(Request $request, int $id, DeleteCalorieEntryById $deleteCalorieEntryById)
     {
-        $rows = $deleteCalorieEntryById->execute($id, Auth::id());
+        $rows = $deleteCalorieEntryById->execute(id: $id, userId: Auth::id());
         if ($rows == 0) {
-            return $this->sendJsonResponse(false, 'Failed to trash entry', [], [], 422);
+            return $this->sendJsonResponse(state: false, message: 'Failed to trash entry', errors: [], data: [], status: 422);
         }
-        return $this->sendJsonResponse(true, 'Entry trashed', [], [], 201);
+        return $this->sendJsonResponse(state: true, message: 'Entry trashed', errors: [], data: [], status: 201);
     }
 }

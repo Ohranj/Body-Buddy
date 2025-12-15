@@ -15,11 +15,14 @@ class ProfileController extends Controller
      */
     public function __invoke(Request $request, RetrieveCalorieTargetForDay $retrieveCalorieTargetForDay)
     {
-        $calorieTarget = $retrieveCalorieTargetForDay->execute($request->day->today());
-        $calorieTarget->human_created = Carbon::parse($calorieTarget->updated_at)->format('M jS Y');
+        $calorieTarget = $retrieveCalorieTargetForDay->execute(user: Auth::id(), day: $request->day->today());
+        $calorieTarget->human_created = Carbon::parse($calorieTarget->created_at)->format('M jS Y');
+
+        $date = Carbon::today()->toDateString();
 
         return Inertia::render('Profile', [
             'user' => Auth::user(),
+            'date' => $date,
             'calorieTarget' => $calorieTarget
         ]);
     }

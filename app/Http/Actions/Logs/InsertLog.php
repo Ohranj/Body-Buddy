@@ -4,7 +4,7 @@ namespace App\Http\Actions\Logs;
 
 class InsertLog
 {
-    public function execute($model, $activity, $data = []): void
+    public function execute($model, string $activity, array $data = []): void
     {
         $model->logs()->create([
             'activity' => $activity,

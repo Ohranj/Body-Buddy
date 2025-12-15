@@ -43,9 +43,9 @@ class RegisterController extends Controller
         $insertLog->execute($user, 'LOGGED_IN');
 
         $date = Carbon::createFromTimestamp(0);
-        $key = $createCalorieTarget->execute(2500, $date);
+        $key = $createCalorieTarget->execute(user: $user->id, target: 2500, take_effect: $date);
         Log::info($key);
-        $insertLog->execute($user, 'NEW_CALORIE_TARGET');
+        $insertLog->execute(model: $user, activity: 'NEW_CALORIE_TARGET');
 
         return $this->sendJsonResponse(true, 'Account created', [], [], 201);
     }

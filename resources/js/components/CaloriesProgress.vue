@@ -83,6 +83,6 @@ export default {
                 </button>
             </div>
         </div>
-        <Link href="profile" class="text-lime-600 absolute right-2 top-2 text-xs hover:underline underline-offset-2"><sup>*</sup>Target updated: <span v-text="calories.dailyTarget?.human_created"></span></Link>
+        <Link href="profile" class="text-lime-600 absolute right-2 top-2 text-xs hover:underline underline-offset-2"><sup>*</sup>Target assigned: <span v-text="calories.dailyTarget?.human_created"></span></Link>
     </div>
 </template>

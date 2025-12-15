@@ -26,19 +26,18 @@ class AuthenticateController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return $this->sendJsonResponse(false, 'Unable to authenticate credentials', [], [], 422);
+            return $this->sendJsonResponse(state: false, message: 'Unable to authenticate credentials', errors: [], data: [], status: 422);
         }
 
         $credentials = $validator->safe(['email', 'password']);
         $isValidAttempt = Auth::attempt($credentials);
         if (!$isValidAttempt) {
-            return $this->sendJsonResponse(false, 'Unable to authenticate credentials', [], [], 422);
+            return $this->sendJsonResponse(state: false, message: 'Unable to authenticate credentials', errors: [], data: [], status: 422);
         }
 
-        $user = Auth::user();
-        $insertLog->execute($user, 'LOGGED_IN');
+        $insertLog->execute(model: Auth::user(), activity: 'LOGGED_IN');
 
-        return $this->sendJsonResponse(true, 'Account Authenticated', [], [], 200);
+        return $this->sendJsonResponse(state: true, message: 'Account Authenticated', errors: [], data: [], status: 200);
     }
 
     /**
