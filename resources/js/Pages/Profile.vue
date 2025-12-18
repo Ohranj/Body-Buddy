@@ -25,7 +25,9 @@ export default {
             modals: {
                 calorieTargets: {
                     show: false,
-                    list: []
+                    entries: [],
+                    page: 1,
+                    perPage: 10
                 }
             }
         }
@@ -34,7 +36,7 @@ export default {
         async onCalorieTargetConfirm() {
             const response = await fetch('/calorietarget', {
                 method: 'POST',
-                body: JSON.stringify(this.calorieTarget),
+                body: JSON.stringify(this.calorieTarget.current),
                 headers: {
                     'accept': 'application/json',
                     'Content-Type': 'application/json',
@@ -44,12 +46,45 @@ export default {
             const json = await response.json()
             const notification = {success: json.success, message: json.message, show: true}
             this.notifications.add(notification)
+            await this.retrieveCalorieTargets()
         },
         async retrieveCalorieTargets() {
-            const response = await fetch('/calorietarget');
+            const params = new URLSearchParams({
+                page: this.modals.calorieTargets.page,
+                perPage: this.modals.calorieTargets.perPage
+            })
+            const response = await fetch('/calorietarget?' + params);
             const json = await response.json()
-            this.modals.calorieTargets.list = json.data.targets;
-            console.log(json)
+            this.modals.calorieTargets.entries = json.data.targets;
+        },
+        async onRemoveEntries() {
+            const ids = this.modals.calorieTargets.entries.reduce((acc, cur) => {
+                if (cur.toggled) acc.push(cur.id)
+                return acc;
+            }, [])
+            const responses = await Promise.all(ids.map((x) => this.deleteEntry(x)))
+            for (const x of responses) {
+                const notification = {success: x.success, message: x.message, show: true}
+                this.notifications.add(notification)
+            } 
+            await this.retrieveCalorieTargets()
+        },
+        async deleteEntry(id) {
+            const response = await fetch('/calorietarget/' + id, {
+                method: 'DELETE',
+                headers: {
+                    'accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': this.$page.props.shared_token
+                }
+            })
+            const json = await response.json()
+            return json;
+        }
+    },
+    computed: {
+        deleteSelectedCalorieTargetEntries() {
+            return this.modals.calorieTargets?.entries?.reduce((acc, cur) => cur.toggled ? acc += 1 : acc, 0);
         }
     },
     created() {
@@ -88,9 +123,6 @@ export default {
             </div>
 
 
-
-
-
             <Modal :show="modals.calorieTargets.show" title="Calorie Targets" @toggle-modal="this.modals.calorieTargets.show=false">
                 <template v-slot:content>
                     <div>
@@ -104,7 +136,7 @@ export default {
                                 </tr>
                             </thead>
                             <tbody>
-                                <template v-for="(entry, index) of modals.calorieTargets.list" :key="entry.id">
+                                <template v-for="(entry, index) of modals.calorieTargets.entries" :key="entry.id">
                                     <tr class="hover:bg-zinc-200 border-b border-zinc-300" :class="{'bg-red-200': entry.toggled}">
                                         <td class="py-0.75 text-center" v-text="entry.target"></td>
                                         <td class="py-0.75 text-center" v-text="entry.human_take_effect"></td>
@@ -116,12 +148,23 @@ export default {
                                 </template>
                             </tbody>
                         </table>
+                        <div class="flex items-start justify-between mt-3.5 text-xs" v-show="!deleteSelectedCalorieTargetEntries">
+                            <small>Showing page 1 of 2</small>
+                            <div class="flex items-center gap-x-1.5">
+                                <button class="bg-blue-500 hover:bg-blue-600 text-sm rounded p-1 font-semibold text-white shadow shadow-black block cursor-pointer"><Chevron class="w-4 h-4 rotate-90" stroke="#FFFFFF" fill="none" /></button>
+                                <button class="bg-blue-500 hover:bg-blue-600 text-sm rounded p-1 font-semibold text-white shadow shadow-black block cursor-pointer"><Chevron class="w-4 h-4 -rotate-90" stroke="#FFFFFF" fill="none" /></button>
+                            </div>
+                        </div>
                         <Transition name="fade">
-                            <div class="flex items-start justify-between mt-3.5">
-                                <small class="text-xs font-semibold inline-block">6 entries to remove</small>
-                                <button class="bg-blue-500 hover:bg-blue-600 text-sm mx-1 rounded px-2 py-1 font-semibold text-white shadow shadow-black block cursor-pointer">Remove</button>
+                            <div v-show="deleteSelectedCalorieTargetEntries >= 1" class="flex items-start justify-between mt-3.5">
+                                <small class="text-xs font-semibold inline-block">Targets to remove: <span v-text="deleteSelectedCalorieTargetEntries"></span></small>
+                                <button class="bg-blue-500 hover:bg-blue-600 text-sm mx-1 rounded px-2 py-1 font-semibold text-white shadow shadow-black block cursor-pointer" @click="onRemoveEntries()">Remove</button>
                             </div>
                         </Transition>
+                        <div v-show="modals.calorieTargets.entries?.length == 0" class="flex flex-col items-center my-4 justify-center">
+                            <Close class="w-6 h-6" stroke="#000000" fill="none" />
+                            <small>No entries found</small>
+                        </div>
                     </div>
                 </template>
             </Modal>

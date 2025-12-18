@@ -43,7 +43,7 @@ class RegisterController extends Controller
         $insertLog->execute($user, 'LOGGED_IN');
 
         $date = Carbon::createFromTimestamp(0);
-        $key = $createCalorieTarget->execute(user: $user->id, target: 2500, take_effect: $date);
+        $key = $createCalorieTarget->execute(user: $user->id, target: 2500, take_effect: $date, can_trash: false);
         Log::info($key);
         $insertLog->execute(model: $user, activity: 'NEW_CALORIE_TARGET');
 

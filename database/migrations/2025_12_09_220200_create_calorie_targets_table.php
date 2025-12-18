@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id');
             $table->unsignedSmallInteger('target')->default(2500);
             $table->date('take_effect');
+            $table->boolean('can_trash')->default(true);
             $table->timestamps();
         });
     }
