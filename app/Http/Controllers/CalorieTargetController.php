@@ -23,14 +23,20 @@ class CalorieTargetController extends Controller
     public function index(Request $request)
     {
         //Paginate
-        $targets = DB::table('calorie_targets')->where('user_id', Auth::id())->orderBy('take_effect', 'asc')->get();
+        $page = $request->page;
+        $offset = $request->perPage * ($page - 1);
+        $targets = DB::table('calorie_targets')->where('user_id', Auth::id())->orderBy('take_effect', 'asc')->offset($offset)->limit($request->perPage)->get();
         foreach ($targets as $target) {
             $target->toggled = false;
             $target->human_take_effect = Carbon::parse($target->take_effect)->format('M jS Y');
             $target->human_created = Carbon::parse($target->created_at)->format('M jS Y');
         }
+
+        $totalEntries = DB::table('calorie_targets')->where('user_id', Auth::id())->count();
+
         $data = [
-            'targets' => $targets
+            'targets' => $targets,
+            'total' => $totalEntries
         ];
         return $this->sendJsonResponse(state: true, message: 'Calorie targets retrieved', errors: [], data: $data, status: 201);
     }

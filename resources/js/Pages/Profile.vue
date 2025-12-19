@@ -27,7 +27,8 @@ export default {
                     show: false,
                     entries: [],
                     page: 1,
-                    perPage: 10
+                    perPage: 15,
+                    total: 1
                 }
             }
         }
@@ -56,6 +57,7 @@ export default {
             const response = await fetch('/calorietarget?' + params);
             const json = await response.json()
             this.modals.calorieTargets.entries = json.data.targets;
+            this.modals.calorieTargets.total = json.data.total
         },
         async onRemoveEntries() {
             const ids = this.modals.calorieTargets.entries.reduce((acc, cur) => {
@@ -67,6 +69,7 @@ export default {
                 const notification = {success: x.success, message: x.message, show: true}
                 this.notifications.add(notification)
             } 
+            this.modals.calorieTargets.page = 1;
             await this.retrieveCalorieTargets()
         },
         async deleteEntry(id) {
@@ -85,6 +88,9 @@ export default {
     computed: {
         deleteSelectedCalorieTargetEntries() {
             return this.modals.calorieTargets?.entries?.reduce((acc, cur) => cur.toggled ? acc += 1 : acc, 0);
+        },
+        calorieTargetsTotalPages() {
+            return Math.ceil(this.modals.calorieTargets.total / this.modals.calorieTargets.perPage)
         }
     },
     created() {
@@ -126,12 +132,17 @@ export default {
             <Modal :show="modals.calorieTargets.show" title="Calorie Targets" @toggle-modal="this.modals.calorieTargets.show=false">
                 <template v-slot:content>
                     <div>
+                        <select class="p-0.5 text-xs cursor-pointer font-semibold ml-auto block mb-3.5 rounded-md shadow shadow-black border" v-model="modals.calorieTargets.perPage" @change="modals.calorieTargets.page = 1; retrieveCalorieTargets()">
+                            <option value="15">Show 15 per page</option>
+                            <option value="25">Show 25 per page</option>
+                            <option value="50">Show 50 per page</option>
+                        </select>
                         <table class="text-black w-full text-xs">
                             <thead>
                                 <tr class="font-semibold">
                                     <th class="underline">Target</th>
-                                    <th class="underline">Take Effect</th>
-                                    <th class="underline">Created</th>
+                                    <th class="underline text-left">Take Effect</th>
+                                    <th class="underline text-left">Created</th>
                                     <th class="underline">Remove</th>
                                 </tr>
                             </thead>
@@ -139,8 +150,8 @@ export default {
                                 <template v-for="(entry, index) of modals.calorieTargets.entries" :key="entry.id">
                                     <tr class="hover:bg-zinc-200 border-b border-zinc-300" :class="{'bg-red-200': entry.toggled}">
                                         <td class="py-0.75 text-center" v-text="entry.target"></td>
-                                        <td class="py-0.75 text-center" v-text="entry.human_take_effect"></td>
-                                        <td class="py-0.75 text-center" v-text="entry.human_created"></td>
+                                        <td class="py-0.75" v-text="entry.human_take_effect"></td>
+                                        <td class="py-0.75" v-text="entry.human_created"></td>
                                         <td class="py-0.75 text-center">
                                             <button class="cursor-pointer hover:scale-[1.25]" @click="entry.toggled = !entry.toggled"><Close class="w-4 h-4" stroke="red" fill="none" /></button>
                                         </td>
@@ -149,10 +160,10 @@ export default {
                             </tbody>
                         </table>
                         <div class="flex items-start justify-between mt-3.5 text-xs" v-show="!deleteSelectedCalorieTargetEntries">
-                            <small>Showing page 1 of 2</small>
+                            <small class="font-semibold">Showing page <span v-text="modals.calorieTargets.page"></span> of <span v-text="calorieTargetsTotalPages"></span></small>
                             <div class="flex items-center gap-x-1.5">
-                                <button class="bg-blue-500 hover:bg-blue-600 text-sm rounded p-1 font-semibold text-white shadow shadow-black block cursor-pointer"><Chevron class="w-4 h-4 rotate-90" stroke="#FFFFFF" fill="none" /></button>
-                                <button class="bg-blue-500 hover:bg-blue-600 text-sm rounded p-1 font-semibold text-white shadow shadow-black block cursor-pointer"><Chevron class="w-4 h-4 -rotate-90" stroke="#FFFFFF" fill="none" /></button>
+                                <button class="bg-blue-500 hover:bg-blue-600 text-sm rounded p-1 font-semibold text-white shadow shadow-black block" :class="{'cursor-pointer': modals.calorieTargets.page > 1}" :disabled="modals.calorieTargets.page <= 1" @click="modals.calorieTargets.page -= 1; retrieveCalorieTargets()"><Chevron class="w-4 h-4 rotate-90" stroke="#FFFFFF" fill="none" /></button>
+                                <button class="bg-blue-500 hover:bg-blue-600 text-sm rounded p-1 font-semibold text-white shadow shadow-black block" :class="{'cursor-pointer': modals.calorieTargets.page < calorieTargetsTotalPages}" :disabled="modals.calorieTargets.page >= calorieTargetsTotalPages" @click="modals.calorieTargets.page += 1; retrieveCalorieTargets()"><Chevron class="w-4 h-4 -rotate-90" stroke="#FFFFFF" fill="none" /></button>
                             </div>
                         </div>
                         <Transition name="fade">
